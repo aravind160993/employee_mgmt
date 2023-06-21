@@ -39,6 +39,7 @@ Route::middleware('auth:api')->group(function () {
 
     // For employees
     Route::get('/employees', [EmployeeController::class, 'index']);
+    Route::get('/employees/ssp', [EmployeeController::class, 'getEmployeesData']);
     Route::post('/employees', [EmployeeController::class, 'store']);
     Route::get('/employees/{token}', [EmployeeController::class, 'show']);
     Route::put('/employees/{token}', [EmployeeController::class, 'update']);

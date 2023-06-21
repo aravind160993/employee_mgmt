@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Resources\EmployeeResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+// use DataTables;
 
 class EmployeeController extends Controller
 {
@@ -16,6 +18,38 @@ class EmployeeController extends Controller
 
         return EmployeeResource::collection($employees);
     }
+
+    public function getEmployeesData(Request $request)
+    {
+        $query = Employee::query();
+
+        // Apply filtering based on request input
+        if ($request->filled('dept_token')) {
+            $query->where('department_token', $request->input('dept_token'));
+        }
+
+        // Apply pagination based on request input
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 12);
+        $offset = ($page - 1) * $limit;
+
+        $total = $query->count();
+        $employees = $query->offset($offset)->limit($limit)->get();
+
+        return EmployeeResource::collection($employees)
+            ->additional(['meta' => [
+                'total' => $total,
+                'page' => $page,
+                'limit' => $limit,
+            ]]);
+    }
+
+    // public function getEmployeesData()
+    // {
+    //     $employees = Employee::query();
+
+    //     return DataTables::of($employees)->toJson();
+    // }
 
     public function store(EmployeeRequest $request)
     {
